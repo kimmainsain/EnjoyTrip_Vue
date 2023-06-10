@@ -1,26 +1,25 @@
 <template>
-  <b-row>
+  <b-row style="font-family: 'Ubuntu', sans-serif;">
     <b-col cols="9">
       <div class="board-list">
-        <h3 id="title" style="font-family: 'Ubuntu', sans-serif;">Community</h3>
+        <h3 id="title">Community</h3>
         <b-row class="mb-1">
           <b-col class="text-right">
-            <b-button variant="outline-primary" @click="WriteArticle"
-              >
-              <i class="fa-solid fa-pen-nib fa-2xl" style=""> Post</i>
-              </b-button
-            >
+            <div style="float: left">
+              <input type="text" v-model="inputKeyword" placeholder="keyword to search" style="
+              margin-left: 15px; margin-right: 5px;"/>
+              <b-button @click="search" variant="outline-primary"><i class="fa-solid fa-magnifying-glass fa-lg"> search</i></b-button>
+            </div>
+            <div>
+              <b-button v-if="logged" variant="outline-primary" @click="WriteArticle">
+                <i class="fa-solid fa-pen-nib fa-2xl" style=""> Post</i>
+              </b-button>
+            </div>
           </b-col>
         </b-row>
         <div v-if="articles != null">
-          <table class="board-list" style="font-family: 'Ubuntu', sans-serif;">
-            <b-table
-              striped
-              hover
-              :items="articles"
-              :fields="fields"
-              @row-clicked="BoardDetail"
-            >
+          <table class="board-list">
+            <b-table striped hover :items="articles" :fields="fields" @row-clicked="BoardDetail">
               <template #cell(time)="data">
                 {{ data.value | dateFormat }}
               </template>
@@ -61,8 +60,19 @@ export default {
         { key: "time", label: "Time" },
         { key: "nickName", label: "NickName" },
       ],
+        keyword : "",
+        inputKeyword : "",
+        logged : false,
     };
   },
+    created(){
+      let user = sessionStorage.getItem('vuex');
+      if(user == null){
+          this.logged = false;
+      }else{
+          this.logged = true;
+      }
+    },
   filters: {
     dateFormat(time) {
       return moment(new Date(time)).format("MMMM DD, YYYY");
@@ -73,22 +83,30 @@ export default {
   },
   methods: {
     fnGetList() {
-      this.$axios
-        .get(
-          this.$serverUrl +
-            `/api/board/free/paging?pageNum=${this.pageNum}&numOfRows=${this.numOfRows}`,
-          {}
-        )
-        .then((res) => {
-          this.articles = res.data.data; //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
-          this.pages = res.data.pages;
-          console.log(this.articles);
-        })
-        .catch((err) => {
-          if (err.message.indexOf("Network Error") > -1) {
-            alert("네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.");
-          }
-        });
+        let url = '';
+        if(this.keyword === ''){
+            url = `/api/board/free/paging?pageNum=${this.pageNum}&numOfRows=${this.numOfRows}`;
+        }else{
+            url = `/api/board/free/search/paging?pageNum=${this.pageNum}&numOfRows=${this.numOfRows}&keyword=${encodeURI(this.keyword)}`
+        }
+
+        this.$axios
+            .get(
+                this.$serverUrl + url
+            )
+            .then((res) => {
+                if(this.keyword === '')
+                  this.articles = res.data.data; //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
+                else this.articles = res.data.data.reverse()
+
+                this.pages = res.data.pages;
+                console.log(this.articles);
+            })
+            .catch((err) => {
+                if (err.message.indexOf("Network Error") > -1) {
+                    alert("네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.");
+                }
+            });
     },
     mvPage(page) {
       this.pageNum = page;
@@ -105,6 +123,11 @@ export default {
         params: { articleno: article.articleNo, boardtype: "free" },
       });
     },
+      search(){
+          this.keyword = this.inputKeyword;
+          this.pageNum = 1;
+          this.fnGetList();
+      }
   },
 };
 </script>

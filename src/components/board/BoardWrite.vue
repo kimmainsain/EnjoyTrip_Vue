@@ -5,7 +5,7 @@
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group
           id="title-group"
-          label="Title:"
+          label="Title"
           label-for="title"
           description="Please enter the title."
         >
@@ -18,7 +18,7 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-form-group id="content-group" label="Content:" label-for="content">
+        <b-form-group id="content-group" label="Content" label-for="content">
           <b-form-textarea
             id="content"
             v-model="article.content"
@@ -119,6 +119,18 @@ export default {
   font-size: 1.5rem;
   border-radius: 25px;
   margin: 20px;
+}
+
+#content-group, #title-group {
+  font-weight: bold;
+}
+
+#title {
+  border-radius: 20px;
+  background-image: none !important;
+  color: black !important;
+  font-size: 1rem;
+  max-width: none !important;
 }
 
 #board-write {

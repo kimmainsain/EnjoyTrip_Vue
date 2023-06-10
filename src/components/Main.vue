@@ -54,6 +54,10 @@ export default {
   text-align: center;
   height: 70vh;
   border-radius: 20px;
+  background-image: none !important;
+  color: black !important;
+  font-size: 1.3rem;
+  max-width: none !important;
 }
 
 /* #title h1,

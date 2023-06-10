@@ -1,19 +1,24 @@
 <template>
-  <b-row>
+  <b-row style="font-family: 'Ubuntu', sans-serif;">
     <b-col cols="9">
       <div class="board-list">
-        <h3 id="title" style="font-family: 'Ubuntu', sans-serif;">Announcement</h3>
+        <h3 id="title" >Announcement</h3>
         <b-row class="mb-1">
           <b-col class="text-right">
-            <b-button variant="outline-primary" @click="WriteArticle" v-if="editable"
-              >
-              <i class="fa-solid fa-pen-nib fa-2xl"> Post</i>
-              </b-button
-            >
+            <div style="float: left">
+              <input type="text" placeholder="keyword to search" style="
+              margin-left: 15px; margin-right: 5px;"/>
+              <b-button variant="outline-primary"><i class="fa-solid fa-magnifying-glass fa-lg"> search</i></b-button>
+            </div>
+            <div>
+              <b-button v-if="editable" variant="outline-primary" @click="WriteArticle">
+                <i class="fa-solid fa-pen-nib fa-2xl" style=""> Post</i>
+              </b-button>
+            </div>
           </b-col>
         </b-row>
         <div v-if="articles != null">
-          <table class="board-list" style="font-family: 'Ubuntu', sans-serif;">
+          <table class="board-list">
             <b-table
               striped
               hover

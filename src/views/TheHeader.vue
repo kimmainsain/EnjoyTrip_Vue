@@ -12,6 +12,9 @@
           <li class="nav-item" v-if="isLogin" id="mypage">
             <router-link :to="{ name: 'MyPage' }" class="nav-link" id="test">My Page</router-link>
           </li>
+            <li class="nav-item" v-if="!isLogin" id="reset" >
+                <router-link :to="{ name: 'reset' }" class="nav-link">Reset</router-link>
+            </li>
           <li class="nav-item" v-if="!isLogin" id="login" >
             <router-link :to="{ name: 'LoginUser' }" class="nav-link">Login</router-link>
           </li>
@@ -97,7 +100,7 @@ export default {
 }
 
 /* 로그인 로그아웃 동시제어 */
-#login, #logout {
+#login, #logout, #reset {
   background-color: #e8e9ed;
   /* 테두리 둥글게 */
   border-radius: 20px;

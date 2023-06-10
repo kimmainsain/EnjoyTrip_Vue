@@ -1,5 +1,12 @@
 <template>
     <div class="container-fluid" style="height: 100%; font-family: 'Ubuntu', sans-serif;">
+        <b-col cols="9">
+            <b-row>
+                <b-col cols="5"></b-col>
+                <b-col cols="5" id="titless" style="
+                    ">Map</b-col>
+            </b-row>
+        </b-col>
         <div class="row" style="height: 100%; margin-top: 10px; margin-bottom: 10px; width: 100%">
             <div id="map" class="col-7" style="margin-left: 10px; margin-bottom: 10px">
             </div>
@@ -9,53 +16,80 @@
                         <div>
                             <h5 id="title_background">Route</h5>
                             <div id="title_form">
-                                <input type="text" v-model="title"
-                                       v-if="mode === 'regist' || mode ==='edit'"/>
+                                <div v-if="mode === 'view' || mode === 'edit'" >
+                                    <i class="fa-solid fa-book fa-lg" style="
+                                    "></i>&nbsp;&nbsp;
+                                    <img v-if="mode !== 'regist' && !bookmarked" width="30px" height="30px" alt="add bookmark" src="@/assets/bookmark-before.png" @click="makeBookmark"/>
+                                    <img v-if="mode !== 'regist' && bookmarked"  width="30px" height="30px"  alt="remove bookmark" src="@/assets/bookmark-after.png" @click="removeBookmark"/>
+                                </div>
+                                <input type="text" v-model="title" placeholder="Enter the title..." v-if="mode === 'regist' || mode === 'edit'" />
                                 <h2 v-if="mode === 'view'">{{ title }}</h2>
-                                <textarea v-model="memo"
-                                          v-if="mode === 'regist' || mode === 'edit'"/>
+                                <input v-model="memo" placeholder="Enter the memo..."
+                                       v-if="mode === 'regist' || mode === 'edit'" />
                                 <div v-if="mode === 'view'">{{ memo }}</div>
+                                <!-- <div style="width: fit-content; display: inline-block" align="center"> -->
+                                <!-- </div> -->
+
+                                <!-- <span v-if="mode === 'regist' || mode ==='edit'">
+                                    <i class="fa-solid fa-book-open fa-lg"></i>&nbsp;&nbsp;
+                                </span> -->
                                 <b-table striped hover :items="routes" :fields="selectedFields"></b-table>
-                                <b-button @click="regist" v-if="mode === 'regist'">등록</b-button>
-                                <b-button variant="danger"
-                                          v-if="mode !== 'regist' && (admin === true || userNo === loggedUserNo)"
-                                          @click="removeRoute">삭제
-                                </b-button>
-                                <b-button variant="warning"
-                                          v-if="mode !== 'regist' && (admin === true || userNo === loggedUserNo)"
-                                          @click="copyRoute">복사
-                                </b-button>
-                                <b-button variant="primary"
-                                          v-if="mode !== 'regist' && (admin === true || userNo === loggedUserNo)"
-                                          @click="modifyRoute">수정
-                                </b-button>
+
+
+                                <b-button @click="regist" v-if="mode === 'regist'" id="btn_color">Regist</b-button>
+
+                                <i class="fa-solid">
+
+                                    <b-button variant="danger"
+                                              v-if="mode !== 'regist' && (admin === true || userNo === loggedUserNo)"
+                                              @click="removeRoute">Delete
+                                    </b-button>
+                                    <b-button variant="warning"
+                                              v-if="mode !== 'regist'"
+                                              @click="copyRoute">Copy
+                                    </b-button>
+                                    <b-button
+                                        v-if="mode !== 'regist' && (admin === true || userNo === loggedUserNo)"
+                                        @click="modifyRoute" id="btn_color">Modify
+                                    </b-button>
+                                </i>
                             </div>
                         </div>
                         <div v-if="mode === 'view' || mode === 'edit'">
                             <h5 id="title_background">Review</h5>
                             <div id="title_form">
                                 <div v-if="reviewable">
-                                    <input type="text" placeholder="한 마디를 남겨 주세요!" v-model="reviewContent"/>
+                                    <input type="text" placeholder="Write your review!" v-model="reviewContent" />
                                     <div>
-                                        <span>별점 : </span>
-                                        <input type="number" min="1" max="10" v-model="star" size="2" step="1"/>
-                                        <span> / 10</span>
-                                        <b-button style="margin-left: 5px; margin-top: 5px; margin-bottom: 5px"
-                                                  @click="addReview">등록
-                                        </b-button>
+                                        <span>Rating : </span>
+                                        <input type="number" min="1" max="10" v-model="star" size="2" step="1" />
+                                        <span> / 10  </span>
+                                        <i class="fa-solid">
+                                            <b-button
+                                                style="margin-left: 5px; margin-top: 15px; "
+                                                @click="addReview" id="btn_color">regist
+                                            </b-button>
+                                        </i>
                                     </div>
                                 </div>
                                 <b-table striped hover :items="reviewList" :fields="reviewFields">
                                     <template #cell(etc)="row">
-                                        <img src="@/assets/x.png" @click="removeReview(row.item.reviewId)"
-                                             width="15"
-                                             height="15" v-if="reviewRemovable[row.index]"/>
+                                        <span v-if="reviewRemovable[row.index]" @click="removeReview(row.item.reviewId)"
+                                            style="
+                                                    &:hover {
+                                                        color: #ff0000;
+                                                        cursor: pointer;
+                                                    }
+                                                    ">
+                                            <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                                        </span>
+                                        <!-- <img src="@/assets/x.png" @click="removeReview(row.item.reviewId)"
+                                            width="15"
+                                            height="15" v-if="reviewRemovable[row.index]"/> -->
                                     </template>
                                 </b-table>
-                                <b-pagination align="center" :per-page="reviewNumOfRows"
-                                              :current-page="reviewPageNum"
-                                              :totalRows="reviewPages * reviewNumOfRows"
-                                              @change="mvPage"></b-pagination>
+                                <b-pagination align="center" :per-page="reviewNumOfRows" :current-page="reviewPageNum"
+                                    :totalRows="reviewPages * reviewNumOfRows" @change="mvPage"></b-pagination>
                             </div>
                         </div>
                     </div>
@@ -66,7 +100,7 @@
 </template>
 
 <script>
-import {apiInstance} from "@/api";
+import { apiInstance } from "@/api";
 
 var overlay;
 let api = apiInstance();
@@ -80,8 +114,8 @@ export default {
             bounds: null,
             acc: 0,
             selectedFields: [
-                {key: "sequence", label: "#", tdClass: "col-2"},
-                {key: "title", label: "관광지", tdClass: "col-10"},
+                { key: "sequence", label: "#", tdClass: "col-2" },
+                { key: "title", label: "Tourist destinations", tdClass: "col-10" },
             ],
             title: "",
             memo: "",
@@ -95,9 +129,9 @@ export default {
             reviewNumOfRows: 5,
             reviewList: [],
             reviewFields: [
-                {key: "review", label: "리뷰"},
-                {key: "star", label: "별점"},
-                {key: "etc", label: ""}
+                { key: "review", label: "Review" },
+                { key: "star", label: "Rating" },
+                { key: "etc", label: "" }
             ],
             reviewable: false,
             reviewPages: 1,
@@ -198,7 +232,7 @@ export default {
 
             let data = res.data.data;
             let tmp = [];
-            // console.log(data);
+            console.log(data);
             for (let key in data) {
                 tmp.push(
                     {
@@ -286,6 +320,7 @@ export default {
             })
 
             let path = [];
+            console.log('routes : ', this.routes)
 
             for (let elem of this.routes) {
                 console.log(elem);
@@ -346,7 +381,7 @@ export default {
             if (this.elecMarkerOption == null) {
                 let imgSrc = require("@/assets/bulb.png");
                 let imgSize = new kakao.maps.Size(30, 40)
-                let imgOption = {offset: new kakao.maps.Point(15, 40)};
+                let imgOption = { offset: new kakao.maps.Point(15, 40) };
 
                 this.elecMarkerOption = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption)
             }
@@ -560,7 +595,7 @@ export default {
 
             if (res.status === 200) {
                 alert("등록 되었습니다.")
-                this.$router.push({name: "share"})
+                this.$router.push({ name: "share" })
             } else {
                 alert("등록에 실패하였습니다.");
             }
@@ -656,7 +691,7 @@ export default {
                 return;
             }
 
-            this.$router.push({name: "share"})
+            this.$router.push({ name: "share" })
         },
         async copyRoute() {
             this.mode = "regist"
@@ -666,6 +701,7 @@ export default {
         async modifyRoute() {
             console.log(this.routes)
             if (this.mode === 'view') {
+                console.log("0. this.mode : ", this.mode);
                 this.$router.push({
                     name: "KakaoMap", params: {
                         mode: "edit", routes: JSON.stringify(this.routes), routeId: this.routeId,
@@ -674,7 +710,7 @@ export default {
                 })
             } else if (this.mode === 'edit') {
                 let data = {};
-
+                console.log("0. 수정 시작 : ");
                 for (let elem of this.routes) {
                     data[elem.sequence] = {
                         detailId: elem.detailId,
@@ -703,8 +739,10 @@ export default {
                     alert("에러 발생")
                     return
                 }
-
+                alert("수정되었습니다.");
+                console.log("1. 수정완료 ");
                 this.mode = "view"
+                console.log("2. 수정완료 ", this.mode);
             }
         },
         async makeBookmark() {
@@ -797,6 +835,10 @@ function closeOverlay() {
     margin: 20px;
 }
 
+#btn_color {
+    background-image: linear-gradient(135deg, #3670f7 0%, #9368f8 100%);
+            color: white;
+}
 #title_form {
     margin: 0 auto;
     padding: 20px;

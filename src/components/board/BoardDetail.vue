@@ -28,11 +28,11 @@
                         <b-button variant="danger" v-if="editable" pill @click="deleteArticle">Delete</b-button>
                     </div>
                 </div>
-                <ReplyList
+                <ReplyList ref ="replyList"
                         :articleno="article.articleNo"
                         :boardtype="boardtype"
                 ></ReplyList>
-                <ReplyWrite v-if="logged"
+                <ReplyWrite v-if="logged" @update="refresh"
                         :articleno="article.articleNo"
                         :boardtype="boardtype"
                 ></ReplyWrite>
@@ -86,10 +86,14 @@ export default {
                         }
                 });
         },
+        refresh(){
+            console.log("refresh")
+            this.$refs.replyList.fnGetList();
+        },
         moveModifyArticle() {
             this.$router.push({
                 name: "BoardModify",
-                params: {articleno: this.article.articleNo},
+                params: {articleno: this.article.articleNo, title : this.article.title, content : this.article.content},
             });
         },
         deleteArticle() {

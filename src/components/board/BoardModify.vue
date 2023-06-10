@@ -51,14 +51,14 @@ export default {
   data() {
     return {
       article: {
-        title: "",
-        content: "",
+        title: this.$route.params.title,
+        content: this.$route.params.content,
         boardtype: this.$route.params.boardtype,
         articleNo: this.$route.params.articleno,
       },
     };
   },
-  methods: {
+    methods: {
     onSubmit(event) {
       event.preventDefault();
       let err = true;
@@ -119,6 +119,17 @@ export default {
   font-size: 1.5rem;
   border-radius: 25px;
   margin: 20px;
+}
+#content-group, #title-group {
+  font-weight: bold;
+}
+
+#title {
+  border-radius: 20px;
+  background-image: none !important;
+  color: black !important;
+  font-size: 1rem;
+  max-width: none !important;
 }
 
 #board-write {

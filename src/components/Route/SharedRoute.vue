@@ -1,9 +1,19 @@
 <template>
-    <div class="container-fluid" style="width: 100%; height: 100%">
+    <div class="container-fluid" style="width: 100%; height: 100%; font-family: 'Ubuntu', sans-serif;">
+        <b-col cols="9">
+            <b-row>
+                <b-col cols="5"></b-col>
+                <b-col cols="6" id="titless" style="
+            ">Share the route</b-col>
+
+            </b-row>
+        </b-col>
         <div align="center">
             <b-pagination :per-page="numOfRows" :current-page="pageNum" :totalRows="pages * numOfRows" align="center" @change="mvPage" style="margin-top: 20px; width: fit-content">
             </b-pagination>
-            <b-form-checkbox v-if="logged" @change="getData" v-model="bookmark">즐겨찾기</b-form-checkbox>
+            <b-form-checkbox v-if="logged" @change="checkBox" v-model="bookmark" style="display: inline-flex; float: right">
+                <i class="fa-solid fa-bookmark fa-lg"></i>
+                Bookmark</b-form-checkbox>
         </div>
         <div id="list" class="container">
             <div class="row">
@@ -22,7 +32,7 @@ export default {
     components: {BasicRoute},
     data() {
         return {
-            numOfRows : 9,
+            numOfRows : 6,
             pageNum : 1,
             pages : 1,
             routes : [],
@@ -45,6 +55,10 @@ export default {
     methods : {
         mvPage(page){
             this.pageNum = page;
+            this.getData()
+        },
+        checkBox(){
+            this.pageNum = 1;
             this.getData()
         },
         async getData(){
@@ -94,8 +108,8 @@ export default {
             }
 
             this.routes = routes;
-            console.log(routes)
-            this.pages = data.pages;
+            console.log("res", res);
+            this.pages = res.data.pages;
         }
     },
 }

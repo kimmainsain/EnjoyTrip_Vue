@@ -49,12 +49,14 @@ const memberStore = {
           commit("SET_USER_INFO", data);
           sessionStorage.setItem("access-token", accessToken);
           // sessionStorage.setItem("refresh-token", refreshToken);
+          alert('로그인 되었습니다.')
         },
         (error) => {
           commit("SET_IS_LOGIN", false);
           commit("SET_IS_LOGIN_ERROR", true);
           commit("SET_IS_VALID_TOKEN", false);
           console.log(error);
+          alert("로그인에 실패하였습니다.")
         }
       );
     },

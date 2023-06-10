@@ -1,11 +1,18 @@
 
 <template>
     <div style="width: 100%; height: 100%; font-family: 'Ubuntu', sans-serif;">
+        <b-col cols="9">
+            <b-row>
+                <b-col cols="5"></b-col>
+                <b-col cols="5" id="titless" style="
+                    ">Tourist attractions</b-col>
+            </b-row>
+        </b-col>
         <div class="container-fluid" style="width: 100%; height: 100%; display: flex; flex-direction: column">
             <div class="row" style="margin-top: 10px; margin-bottom: 20px; height: 5%;">
                 <div class="col-3">
-                    <select id="search-area" class="form-select" v-model="region" required >
-                        <option value="" disabled selected style="display: none">검색 할 지역 선택 select</option>
+                    <select id="search-area" class="form-select" v-model="region" required>
+                        <option value="" disabled selected style="display: none">select region</option>
                         <option value="1">서울</option>
                         <option value="2">인천</option>
                         <option value="3">대전</option>
@@ -27,7 +34,7 @@
                 </div>
                 <div class="col-3">
                     <select id="search-content-id" class="form-select" v-model="content_id" required>
-                        <option value="" disabled selected style="display: none">관광지 유형</option>
+                        <option value="" disabled selected style="display: none">type</option>
                         <option value="12">관광지</option>
                         <option value="14">문화시설</option>
                         <option value="15">축제공연행사</option>
@@ -39,11 +46,15 @@
                     </select>
                 </div>
                 <div class="col-4">
-                    <input id="search-keyword" class="form-control" type="search" placeholder="검색어" aria-label="검색어"
-                           v-model="keyword" @keyup.enter="search"/>
+                    <input id="search-keyword" class="form-control" type="search" placeholder="enter the keyword..."
+                        aria-label="검색어" v-model="keyword" @keyup.enter="search" />
                 </div>
                 <div class="col-2">
-                    <button id="btn-search" class="btn btn-outline-success" type="button" @click="search">검색</button>
+                    <i class="fa-solid">
+                    <button id="btn-search" class="btn btn-outline-primary" type="button" @click="search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        search</button>
+                    </i>
                 </div>
             </div>
             <div class="row" style="height: 50%">
@@ -51,29 +62,30 @@
                     <div id="map" style="width: 100%;height: 100%"></div>
                 </div>
                 <div class="col-4" style="height: 100%">
+                    <h1 id="titless">Travel route</h1>
                     <table class="table b-table table-striped table-hover">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>관광지</th>
-                            <th></th>
-                        </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Tourist attractions</th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <draggable v-model="selectedAttraction" tag="tbody" @end="resequence">
                             <tr v-for="(elem, idx) in selectedAttraction" class="container" :key="idx">
-                                <td>{{elem.sequence}}</td>
-                                <td>{{elem.title}}</td>
+                                <td>{{ elem.sequence }}</td>
+                                <td>{{ elem.title }}</td>
                                 <td><b-button variant="danger" @click="removeSelected(idx)"
-                                              style="--mdb-btn-padding-top: 0.150rem; --mdb-btn-padding-bottom: 0.150rem; --mdb-btn-padding-x: 0.5rem; --mdb-btn-font-size: 0.50rem; --mdb-btn-line-height: 1.5;">
-                                    X
-                                </b-button></td>
+                                        style="--mdb-btn-padding-top: 0.150rem; --mdb-btn-padding-bottom: 0.150rem; --mdb-btn-padding-x: 0.5rem; --mdb-btn-font-size: 0.50rem; --mdb-btn-line-height: 1.5;">
+                                        X
+                                    </b-button></td>
                             </tr>
 
                         </draggable>
                     </table>
 
 
-                        <!-- <b-table striped hover id="selected_route_list" :items="selectedAttraction"
+                <!-- <b-table striped hover id="selected_route_list" :items="selectedAttraction"
                                 :fields="selectedFields" tbody-tr-class="container drag_item"
                                 primary-key="contentId" draggable="true"
                        >
@@ -99,28 +111,34 @@
                                    </div>
                                </div>
                            </template>
-                       </b-table> -->
+                           </b-table> -->
 
 
-                    <b-button v-if="mode==='regist' && selectedAttraction.length != 0" @click="moveToRouteView">등록
+                    <b-button v-if="mode === 'regist' && selectedAttraction.length != 0" @click="moveToRouteView"  variant="outline-primary">등록
                     </b-button>
-                    <b-button variant="warning" v-if="mode==='edit' && selectedAttraction.length != 0"
-                              @click="modifyRoute">수정
+                    <b-button variant="outline-warning" v-if="mode === 'edit' && selectedAttraction.length != 0"
+                        @click="modifyRoute">수정
                     </b-button>
                 </div>
             </div>
+            <!-- <b-col cols="9" v-if="searchRst != null && searchRst.length !== 0">
+                <b-row>
+                    <b-col cols="5"></b-col>
+                    <b-col cols="5" id="titless" style="
+                    ">Tourist attractions</b-col>
+                </b-row>
+            </b-col> -->
             <b-pagination :per-page="numOfRows" :current-page="pageNum" :totalRows="pages * numOfRows" align="center"
-                          @change="mvPage" v-if="searchRst != null && searchRst.length !== 0"
-                          style="height: 5%; margin-top: 5px"
-            ></b-pagination>
+                @change="mvPage" v-if="searchRst != null && searchRst.length !== 0"
+                style="height: 5%; margin-top: 5px"></b-pagination>
             <div style="flex-grow: 1; overflow-y: scroll; height: 450px">
                 <b-table striped hover id="resultTable" :items="getList" :fields="fields"
-                         v-if="searchRst != null && searchRst.length !== 0">
+                    v-if="searchRst != null && searchRst.length !== 0">
                     <template #cell(img)="row">
-                        <img :src="row.item.firstImage" alt="img" width="50" height="50"/>
+                        <img :src="row.item.firstImage" alt="img" width="50" height="50" />
                     </template>
                     <template #cell(addBtn)="row">
-                        <b-button @click="addBtnClick(row.item.contentId)" v-if="getFlag[row.index]">추가</b-button>
+                        <b-button @click="addBtnClick(row.item.contentId)" v-if="getFlag[row.index]" variant="outline-primary">add</b-button>
                     </template>
                 </b-table>
             </div>
@@ -131,7 +149,7 @@
 
 
 <script>
-import {apiInstance} from "@/api";
+import { apiInstance } from "@/api";
 import draggable from "vuedraggable";
 
 const api = apiInstance();
@@ -157,10 +175,10 @@ export default {
             serachParam: null,
 
             fields: [
-                {key: "img", label: "사진"},
-                {key: "title", label: "이름"},
-                {key: "addr1", label: "주소"},
-                {key: "addBtn", label: ""}
+                { key: "img", label: "Picture" },
+                { key: "title", label: "Tourist attractions" },
+                { key: "addr1", label: "Address" },
+                { key: "addBtn", label: "" }
             ],
 
             attractionMarkers: {},
@@ -168,9 +186,9 @@ export default {
 
             selectedAttraction: [],
             selectedFields: [
-                {key: "sequence", label: "#", tdClass: "col-1"},
-                {key: "title", label: "관광지", tdClass: "col-8"},
-                {key: "btn", label: '', tdClass: "col-3"},
+                { key: "sequence", label: "#", tdClass: "col-1" },
+                { key: "title", label: "관광지", tdClass: "col-8" },
+                { key: "btn", label: '', tdClass: "col-3" },
             ],
 
             adjacentAttraction: [],
@@ -181,6 +199,8 @@ export default {
             electricMarkers: {},
             routeLine: null,
             mode: "regist",
+            logged : false,
+            alerted : false,
         };
     },
     computed: {
@@ -188,26 +208,26 @@ export default {
             let flags = [];
 
             outer:
-                for (let idx in this.searchRst) {
-                    for (let idx2 in this.selectedAttraction) {
-                        if (this.searchRst[idx].contentId === this.selectedAttraction[idx2].contentId) {
-                            flags.push(false);
-                            continue outer;
-                        }
+            for (let idx in this.searchRst) {
+                for (let idx2 in this.selectedAttraction) {
+                    if (this.searchRst[idx].contentId === this.selectedAttraction[idx2].contentId) {
+                        flags.push(false);
+                        continue outer;
                     }
-                    flags.push(true);
                 }
+                flags.push(true);
+            }
 
             outer2:
-                for (let idx in this.adjacentAttraction) {
-                    for (let idx2 in this.selectedAttraction) {
-                        if (this.adjacentAttraction[idx].contentId === this.selectedAttraction[idx2].contentId) {
-                            flags.push(false)
-                            continue outer2;
-                        }
+            for (let idx in this.adjacentAttraction) {
+                for (let idx2 in this.selectedAttraction) {
+                    if (this.adjacentAttraction[idx].contentId === this.selectedAttraction[idx2].contentId) {
+                        flags.push(false)
+                        continue outer2;
                     }
-                    flags.push(true);
                 }
+                flags.push(true);
+            }
 
             // outer:
             // for(let elem of this.searchRst){
@@ -236,6 +256,15 @@ export default {
             this.mode = "edit"
             this.selectedAttraction = JSON.parse(param)
         }
+
+
+        let user = sessionStorage.getItem("access-token");
+        if(user == null){
+            this.logged = false
+        }else{
+            this.logged = true;
+        }
+        this.alerted = false;
 
         closeBtn = require("@/assets/overlay_close.png")
         // eslint-disable-next-line no-undef
@@ -329,6 +358,11 @@ export default {
             if (this.keyword === '') {
                 alert("검색할 키워드를 넣어주세요")
                 return;
+            }
+
+            if(!this.logged && !this.alerted){
+                this.alerted = true;
+                alert("로그인 되어 있지 않아 경로를 저장할 수 없습니다!\n유의하세요!");
             }
 
             this.pageNum = 1;
@@ -687,7 +721,7 @@ export default {
             if (this.elecMarkerOption == null) {
                 let imgSrc = require("@/assets/elec-station-mint.png");
                 let imgSize = new kakao.maps.Size(30, 40)
-                let imgOption = {offset: new kakao.maps.Point(15, 40)};
+                let imgOption = { offset: new kakao.maps.Point(15, 40) };
 
                 this.elecMarkerOption = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption)
             }
@@ -722,7 +756,7 @@ export default {
             console.log(this.selectedAttraction)
             this.$router.push({
                 name: "Route",
-                params: {routes: JSON.stringify(this.selectedAttraction), mode: "regist"}
+                params: { routes: JSON.stringify(this.selectedAttraction), mode: "regist" }
             });
         },
         modifyRoute() {
@@ -944,8 +978,8 @@ export default {
                 }
             }
         },
-        resequence(){
-            for(let idx in this.selectedAttraction){
+        resequence() {
+            for (let idx in this.selectedAttraction) {
                 this.selectedAttraction[idx].sequence = Number(idx) + 1;
             }
         }

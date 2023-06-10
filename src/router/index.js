@@ -18,6 +18,7 @@ import RouteView from "@/components/kakaomap/RouteView.vue";
 import SharedRoute from "@/components/Route/SharedRoute.vue";
 
 import MainVue from '../components/Main.vue';
+import ResetPassword from "@/components/user/ResetPassword.vue";
 
 Vue.use(VueRouter)
 
@@ -92,6 +93,11 @@ const routes = [
     path: '/share',
     name: 'share',
     component: SharedRoute
+  },
+  {
+    path: "/reset",
+    name: "reset",
+    component: ResetPassword
   }
 ]
 

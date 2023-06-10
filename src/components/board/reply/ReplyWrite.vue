@@ -43,18 +43,22 @@ export default {
       replyWrite(
         this.reply,
         () => {
-          this.$router.go({
-            name: "BoardDetail",
-            params: {
-              boardtype: this.$route.params.boardtype,
-              articleno: this.$route.params.articleno,
-            },
-          });
+          // this.$router.push({
+          //   name: "BoardDetail",
+          //   params: {
+          //     boardtype: this.$route.params.boardtype,
+          //     articleno: this.$route.params.articleno,
+          //   },
+          // });
+            console.log('before emit')
+            this.$emit('update', 1);
         },
         (err) => {
           console.log(err);
         }
+
       );
+      this.reply.content = ''
     },
   },
 };

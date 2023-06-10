@@ -2,7 +2,7 @@ import axios from "axios";
 
 // local vue api axios instance
 // const BASE_URL = process.env.VUE_APP_BASE_URL;
-const BASE_URL = "http://localhost";
+const BASE_URL = process.env.VUE_APP_BASE_URL;
 function apiInstance() {
   const instance = axios.create({
     // baseURL: process.env + "http://localhost",

@@ -7,7 +7,7 @@
                 <div class="comment-nickname"> {{ comment.nickname }}</div>
                 <div class="comment-time">{{ comment.time | dateFormat }}</div>
             </div>
-            <button class="comment-delete" @click="deleteComment(comment.replyNo)">
+            <button class="comment-delete" @click="deleteComment(comment.replyNo)" v-if="((loggedUserNo != null && loggedUserNo === comment.userNo) || admin)">
                 Delete
             </button>
         </div>
@@ -19,13 +19,24 @@ import moment from "moment";
 
 export default {
     name: "CommentList",
-    props: ['loggedUser'],
     data() {
         return {
             boardtype: this.$route.params.boardtype,
             articleNo: this.$route.params.articleno,
             comments: [],
+            admin : false,
+            loggedUserNo : null,
         };
+    },
+    created() {
+        let user = sessionStorage.getItem("vuex");
+        if (user != null) {
+            let parsedData = JSON.parse(user)['memberStore']['userInfo'];
+            if (Object.prototype.hasOwnProperty.call(parsedData, "admin") && parsedData['admin'] === true) {
+                this.admin = true
+            }
+            this.loggedUserNo = parsedData['userNo'];
+        }
     },
     filters: {
         dateFormat(time) {

@@ -11,7 +11,9 @@
                 <div style="display: inline-block; float:left;" v-if="star != null">
                     <img v-if="star != null" :src="starPath" width="150px" height="50px" />
                 </div>
-                <div style="display: inline-block; float: right">{{ nickname }}</div>
+                <div style="display: inline-block; float: right">
+            <i class="fa-solid fa-user fa-lg"></i>
+                    {{ nickname }}</div>
             </b-card-footer>
         </b-card>
     </div>

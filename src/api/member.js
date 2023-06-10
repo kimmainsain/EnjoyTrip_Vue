@@ -16,6 +16,10 @@ async function regist(user, success, fail) {
   await api.post(`/api/user`, JSON.stringify(user)).then(success).catch(fail);
 }
 
+export function letHash(id, pw){
+  return sha256(id + pw);
+}
+
 async function findById(userid, success, fail) {
   api.defaults.headers["access-token"] = sessionStorage.getItem("access-token");
   await api.get(`/api/user/${userid}`).then(success).catch(fail);
