@@ -1,0 +1,137 @@
+<template>
+  <b-row>
+    <b-col cols="9">
+      <div class="board-list">
+        <h3 id="title" style="font-family: 'Ubuntu', sans-serif;">Announcement</h3>
+        <b-row class="mb-1">
+          <b-col class="text-right">
+            <b-button variant="outline-primary" @click="WriteArticle" v-if="editable"
+              >
+              <i class="fa-solid fa-pen-nib fa-2xl"> Post</i>
+              </b-button
+            >
+          </b-col>
+        </b-row>
+        <div v-if="articles != null">
+          <table class="board-list" style="font-family: 'Ubuntu', sans-serif;">
+            <b-table
+              striped
+              hover
+              :items="articles"
+              :fields="fields"
+              @row-clicked="BoardDetail"
+            >
+              <template #cell(time)="data">
+                {{ data.value | dateFormat }}
+              </template>
+            </b-table>
+          </table>
+        </div>
+        <div v-else>등록된 사용자가 없습니다.</div>
+
+        <div class="overflow-auto">
+          <b-pagination
+            :total-rows="pages * numOfRows"
+            :per-page="numOfRows"
+            :current-page="pageNum"
+            @change="mvPage"
+            align="center"
+          ></b-pagination>
+        </div>
+      </div>
+    </b-col>
+  </b-row>
+</template>
+
+<script>
+import moment from "moment";
+
+export default {
+  name: "AppBoardNotice",
+  data() {
+    //변수생성
+    return {
+      numOfRows: 10,
+      pageNum: 1,
+      pages: 0,
+      articles: [], //리스트 데이터
+      fields: [
+        { key: "articleNo", label: "ArticleNo" },
+        { key: "title", label: "Title" },
+        { key: "time", label: "Time" },
+        { key: "nickName", label: "NickName" },
+      ],
+        editable : false,
+    };
+  },
+    created() {
+        let user = sessionStorage.getItem("vuex");
+        if (user != null) {
+            let parsed = JSON.parse(user)['memberStore']['userInfo'];
+            if(Object.prototype.hasOwnProperty.call(parsed, "admin") && parsed.admin === true ){
+                this.editable = true;
+            }
+        }
+    },
+    filters: {
+    dateFormat(time) {
+      return moment(new Date(time)).format("MMMM DD, YYYY");
+    },
+  },
+  mounted() {
+    this.fnGetList();
+  },
+  methods: {
+    fnGetList() {
+      this.$axios
+        .get(
+          this.$serverUrl +
+            `/api/board/notice/paging?pageNum=${this.pageNum}&numOfRows=${this.numOfRows}`,
+          {}
+        )
+        .then((res) => {
+          this.articles = res.data.data; //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
+          this.pages = res.data.pages;
+          console.log(this.articles);
+        })
+        .catch((err) => {
+          if (err.message.indexOf("Network Error") > -1) {
+            alert("네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.");
+          }
+        });
+    },
+    mvPage(page) {
+      this.pageNum = page;
+      console.log("mvPage + this.page : ", this.pageNum);
+      this.fnGetList();
+    },
+    WriteArticle() {
+      console.log("글쓰기 하러가자!!!");
+      this.$router.push({
+        name: "BoardWrite",
+        params: { boardtype: "notice" },
+      });
+    },
+    BoardDetail(article) {
+      console.log(article);
+      this.$router.push({
+        name: "BoardDetail",
+        params: { articleno: article.articleNo, boardtype: "notice" },
+      });
+    },
+  },
+};
+</script>
+
+<style scoped>
+#title {
+  background-image: linear-gradient(135deg, #3670f7 0%, #9368f8 100%);
+  padding: 1rem;
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+  border-radius: 25px;
+  margin: 18px;
+}
+
+</style>
